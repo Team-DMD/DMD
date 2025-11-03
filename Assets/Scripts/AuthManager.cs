@@ -1,34 +1,27 @@
+using System;
 using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
-public class AuthManager : MonoBehaviour
+public class AuthManager : MonoBehaviour,INetworkRequester
 {
     [SerializeField] private TMP_InputField emailInput;
     [SerializeField] private TMP_InputField passwordInput;
     [SerializeField] private TMP_Text statusText;
 
-    private string registerUrl = "http://52.78.203.32:8080/auth/signup";
-    private string loginUrl = "http://52.78.203.32:8080/auth/login";
+    public Dictionary<int, Action> requests { get; set; } = new();
 
-    [System.Serializable]
-    public class LoginData
+    private string _registerUrl = "http://52.78.203.32:8080/auth/signup";
+    private string _loginUrl = "http://52.78.203.32:8080/auth/login";
+
+    private void Start()
     {
-        public string account_id;
-        public string password;
+        
     }
-
-    [System.Serializable]
-    public class TokenResponse
-    {
-        public string access_token;
-        public string refresh_token;
-        public string access_exp;
-        public string refresh_exp;
-    }
-
+    
     public void OnRegisterClick()
     {
         StartCoroutine(Register(emailInput.text, passwordInput.text));
@@ -44,7 +37,7 @@ public class AuthManager : MonoBehaviour
         LoginData data = new LoginData { account_id = accountId, password = password };
         string jsonData = JsonUtility.ToJson(data);
 
-        using (UnityWebRequest www = new UnityWebRequest(registerUrl, "POST"))
+        using (UnityWebRequest www = new UnityWebRequest(_registerUrl, "POST"))
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -60,8 +53,8 @@ public class AuthManager : MonoBehaviour
             else
             {
                 statusText.text = www.result.ToString();
-                Debug.Log(www.downloadHandler.text);
             }
+            Debug.Log(www.responseCode);
         }
     }
 
@@ -70,7 +63,7 @@ public class AuthManager : MonoBehaviour
         LoginData data = new LoginData { account_id = email, password = password };
         string jsonData = JsonUtility.ToJson(data);
 
-        using (UnityWebRequest www = new UnityWebRequest(loginUrl, "POST"))
+        using (UnityWebRequest www = new UnityWebRequest(_loginUrl, "POST"))
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);
@@ -86,7 +79,7 @@ public class AuthManager : MonoBehaviour
             else
             {
                 string json = www.downloadHandler.text;
-                Debug.Log("Server Response: " + json);
+                //Debug.Log("Server Response: " + json);
 
                 TokenResponse tokens = JsonUtility.FromJson<TokenResponse>(json);
                 if (tokens != null && !string.IsNullOrEmpty(tokens.access_token))
@@ -99,6 +92,21 @@ public class AuthManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void UpLoadCode()
+    {
+        
+    }
+
+    public void AddAction(int code)
+    {
+        
+    }
+
+    public void RemoveCode(int code)
+    {
+        
     }
 
 }
