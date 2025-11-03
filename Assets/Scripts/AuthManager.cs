@@ -1,0 +1,104 @@
+using UnityEngine;
+using UnityEngine.Networking;
+using TMPro;
+using System.Collections;
+using System.Text;
+
+public class AuthManager : MonoBehaviour
+{
+    [SerializeField] private TMP_InputField emailInput;
+    [SerializeField] private TMP_InputField passwordInput;
+    [SerializeField] private TMP_Text statusText;
+
+    private string registerUrl = "http://52.78.203.32:8080/auth/signup";
+    private string loginUrl = "http://52.78.203.32:8080/auth/login";
+
+    [System.Serializable]
+    public class LoginData
+    {
+        public string account_id;
+        public string password;
+    }
+
+    [System.Serializable]
+    public class TokenResponse
+    {
+        public string access_token;
+        public string refresh_token;
+        public string access_exp;
+        public string refresh_exp;
+    }
+
+    public void OnRegisterClick()
+    {
+        StartCoroutine(Register(emailInput.text, passwordInput.text));
+    }
+
+    public void OnLoginClick()
+    {
+        StartCoroutine(Login(emailInput.text, passwordInput.text));
+    }
+
+    IEnumerator Register(string accountId, string password)
+    {
+        LoginData data = new LoginData { account_id = accountId, password = password };
+        string jsonData = JsonUtility.ToJson(data);
+
+        using (UnityWebRequest www = new UnityWebRequest(registerUrl, "POST"))
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                statusText.text = "Register Failed: " + www.error;
+            }
+            else
+            {
+                statusText.text = www.result.ToString();
+                Debug.Log(www.downloadHandler.text);
+            }
+        }
+    }
+
+    IEnumerator Login(string email, string password)
+    {
+        LoginData data = new LoginData { account_id = email, password = password };
+        string jsonData = JsonUtility.ToJson(data);
+
+        using (UnityWebRequest www = new UnityWebRequest(loginUrl, "POST"))
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+            www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            www.downloadHandler = new DownloadHandlerBuffer();
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Login failed: {www.error}");
+            }
+            else
+            {
+                string json = www.downloadHandler.text;
+                Debug.Log("Server Response: " + json);
+
+                TokenResponse tokens = JsonUtility.FromJson<TokenResponse>(json);
+                if (tokens != null && !string.IsNullOrEmpty(tokens.access_token))
+                {
+                    statusText.text="Login Success";
+                }
+                else
+                {
+                    statusText.text = "Login Failed";
+                }
+            }
+        }
+    }
+
+}
