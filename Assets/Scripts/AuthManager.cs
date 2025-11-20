@@ -10,9 +10,11 @@ public class AuthManager : MonoBehaviour,INetworkRequester
 {
     [SerializeField] private TMP_InputField emailInput;
     [SerializeField] private TMP_InputField passwordInput;
-    [SerializeField] private TMP_Text statusText;
 
     public Dictionary<int, Action> requests { get; set; } = new();
+
+    public event Action<bool> onLogin;
+    public event Action<bool> onRegister;
 
     private string _registerUrl = "http://52.78.203.32:8080/auth/signup";
     private string _loginUrl = "http://52.78.203.32:8080/auth/login";
@@ -48,11 +50,13 @@ public class AuthManager : MonoBehaviour,INetworkRequester
 
             if (www.result != UnityWebRequest.Result.Success)
             {
-                statusText.text = "Register Failed: " + www.error;
+                //statusText.text = "Register Failed: " + www.error;
+                onLogin?.Invoke(false);
             }
             else
             {
-                statusText.text = www.result.ToString();
+                //statusText.text = www.result.ToString();
+                onLogin?.Invoke(true);
             }
             Debug.Log(www.responseCode);
         }
@@ -75,6 +79,7 @@ public class AuthManager : MonoBehaviour,INetworkRequester
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError($"Login failed: {www.error}");
+                onLogin?.Invoke(false);
             }
             else
             {
@@ -84,14 +89,21 @@ public class AuthManager : MonoBehaviour,INetworkRequester
                 TokenResponse tokens = JsonUtility.FromJson<TokenResponse>(json);
                 if (tokens != null && !string.IsNullOrEmpty(tokens.access_token))
                 {
-                    statusText.text="Login Success";
+                    //statusText.text="Login Success";
+                    onLogin?.Invoke(true);
                 }
                 else
                 {
-                    statusText.text = "Login Failed";
+                    //statusText.text = "Login Failed";
+                    onLogin?.Invoke(false);
                 }
             }
         }
+    }
+
+    public void Disable()
+    {
+        gameObject.SetActive(false);
     }
 
     public void UpLoadCode()
