@@ -13,15 +13,15 @@ public class AuthManager : MonoBehaviour,INetworkRequester
 
     public Dictionary<int, Action> requests { get; set; } = new();
 
-    public event Action<bool> onLogin;
-    public event Action<bool> onRegister;
+    public event Action<int> onLogin;
+    public event Action<int> onRegister;
 
     private string _registerUrl = "http://52.78.203.32:8080/auth/signup";
     private string _loginUrl = "http://52.78.203.32:8080/auth/login";
 
     private void Start()
     {
-        
+        //requests.Add(200,);
     }
     
     public void OnRegisterClick()
@@ -47,17 +47,7 @@ public class AuthManager : MonoBehaviour,INetworkRequester
             www.SetRequestHeader("Content-Type", "application/json");
 
             yield return www.SendWebRequest();
-
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                //statusText.text = "Register Failed: " + www.error;
-                onLogin?.Invoke(false);
-            }
-            else
-            {
-                //statusText.text = www.result.ToString();
-                onLogin?.Invoke(true);
-            }
+            onRegister?.Invoke((int)www.responseCode);
             Debug.Log(www.responseCode);
         }
     }
@@ -75,35 +65,14 @@ public class AuthManager : MonoBehaviour,INetworkRequester
             www.SetRequestHeader("Content-Type", "application/json");
 
             yield return www.SendWebRequest();
-
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError($"Login failed: {www.error}");
-                onLogin?.Invoke(false);
-            }
-            else
-            {
-                string json = www.downloadHandler.text;
-                //Debug.Log("Server Response: " + json);
-
-                TokenResponse tokens = JsonUtility.FromJson<TokenResponse>(json);
-                if (tokens != null && !string.IsNullOrEmpty(tokens.access_token))
-                {
-                    //statusText.text="Login Success";
-                    onLogin?.Invoke(true);
-                }
-                else
-                {
-                    //statusText.text = "Login Failed";
-                    onLogin?.Invoke(false);
-                }
-            }
+            onLogin?.Invoke((int)www.responseCode);
+            Debug.Log(www.responseCode);
         }
     }
-
-    public void Disable()
+    
+    public void R200()
     {
-        gameObject.SetActive(false);
+        
     }
 
     public void UpLoadCode()

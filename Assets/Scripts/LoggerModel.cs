@@ -5,6 +5,10 @@ using TMPro;
 
 public class LoggerModel : MonoBehaviour
 {
+    [Header("Duration")]
+    [SerializeField] private float startTime;
+    [SerializeField] private float endTime;
+    
     [Header("Login Panel")]
     [SerializeField] private Image loginPanelImage;
     
@@ -27,9 +31,9 @@ public class LoggerModel : MonoBehaviour
     
     void Start()
     {
-        transform.DOMove(new Vector3(0, -0.5f, 0), 1f);
+        transform.DOMove(new Vector3(0, -0.5f, 0), startTime);
         transform.localScale = new Vector3(0,0,0);
-        transform.DOScale(1f, 1f);
+        transform.DOScale(1f, startTime);
         Color loginPanelColor = loginPanelImage.color;
         loginPanelColor.a = 0.0f;
         loginPanelImage.color = loginPanelColor;
@@ -56,15 +60,34 @@ public class LoggerModel : MonoBehaviour
         registerButtonText.color = new Color(registerButtonText.color.r, registerButtonText.color.g, registerButtonText.color.b, 0f);
         
 
-        loginPanelImage.DOFade(1.0f, 1f);
-        idInputFieldImage.DOFade(1.0f, 1f);
-        passwordInputFieldImage.DOFade(1.0f, 1f);
-        loginButtonImage.DOFade(1.0f, 1f);
-        registerButtonImage.DOFade(1.0f, 1f);
+        loginPanelImage.DOFade(1.0f, startTime);
+        idInputFieldImage.DOFade(1.0f, startTime);
+        passwordInputFieldImage.DOFade(1.0f, startTime);
+        loginButtonImage.DOFade(1.0f, startTime);
+        registerButtonImage.DOFade(1.0f, startTime);
         
-        idPlaceholderText.DOFade(1.0f, 1f);
-        passwordPlaceholderText.DOFade(1.0f, 1f);
-        loginButtonText.DOFade(1.0f, 1f);
-        registerButtonText.DOFade(1.0f, 1f);
+        idPlaceholderText.DOFade(1.0f, startTime);
+        passwordPlaceholderText.DOFade(1.0f,startTime);
+        loginButtonText.DOFade(1.0f, startTime);
+        registerButtonText.DOFade(1.0f, startTime);
+    }
+
+    public void OnLogin()
+    {
+        loginPanelImage.DOFade(0f, endTime);
+        idInputFieldImage.DOFade(0f, endTime);
+        passwordInputFieldImage.DOFade(0f, endTime);
+        loginButtonImage.DOFade(0f, endTime);
+        registerButtonImage.DOFade(0f, endTime);
+        
+        idPlaceholderText.DOFade(0f, endTime);
+        passwordPlaceholderText.DOFade(0f, endTime);
+        loginButtonText.DOFade(0f,endTime);
+        registerButtonText.DOFade(0f, endTime);
+        transform.DOScale(0f, endTime).OnComplete(() => 
+        {
+            gameObject.SetActive(false);
+        });;
+        transform.DOMove(new Vector3(0, -2.5f, 0), endTime);
     }
 }

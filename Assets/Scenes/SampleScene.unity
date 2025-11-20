@@ -150,6 +150,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AuthConnecter
   authManager: {fileID: 1796061201}
   authStatusModel: {fileID: 1380571188}
+  loggerModel: {fileID: 764430265}
 --- !u!4 &222281284
 Transform:
   m_ObjectHideFlags: 0
@@ -1182,6 +1183,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66eb3cd8a12fc8940ac051ad87d8fa6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LoggerModel
+  startTime: 0.5
+  endTime: 0.3
   loginPanelImage: {fileID: 764430266}
   idInputFieldImage: {fileID: 556971133}
   passwordInputFieldImage: {fileID: 1166520592}
@@ -1629,8 +1632,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
-  m_fontSizeBase: 50
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
